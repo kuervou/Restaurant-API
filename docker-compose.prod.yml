@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: express
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    # No expongas el puerto de MySQL en producción si no es necesario
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    environment:
+      - NODE_ENV=PRODUCTION
+      - SECRET_KEY=${SECRET_KEY}
+      - DATABASE_URL=${DATABASE_URL} # Usar una variable de entorno para la URL de la base de datos
+    depends_on:
+      - mysql
+    # Volumes no son necesarios en producción
+    # La sincronización del código fuente no debería ocurrir en producción
+
+volumes:
+  mysql-data:
+    driver: local
